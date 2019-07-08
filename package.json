@@ -8,7 +8,7 @@
     "start": "node index.js",
     "server": "nodemon index.js",
     "client": "npm run serve --prefix frontEnd",
-    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "dev": "concurrently \"npm run server\" \"npm run client\""
     // "heroku-postbuild": "npm install --only=dev --no-shrinkwrap --prefix frontEnd && npm install --prefix frontEnd && npm run build --prefix frontEnd"
   },
   "author": "John O Connor",
