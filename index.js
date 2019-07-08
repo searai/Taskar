@@ -14,7 +14,6 @@ const server = express()
 
 const port = process.env.PORT || 5000
 
-server.use(express.static(path.resolve(__dirname,"frontEnd", "dist")))
 server.use(express.json())
 server.use(express.urlencoded({extended:true}))
 server.use(cors())
@@ -39,6 +38,6 @@ server.use("/comment", commentRoutes)
 
 if(process.env.NODE_ENV === "production"){
   server.get("*",(req, res)=>{
-    res.render("index.html")
+    res.sendFile(path.join(__dirname,"frontEnd", "dist", "index.html"))
   })
 }
