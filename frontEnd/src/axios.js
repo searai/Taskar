@@ -1,9 +1,5 @@
 import axios from "axios"
-require('dotenv').config()
-const baseUrl = process.env.BASE_URL
-console.log(baseUrl)
-
-const axiosInstance =  axios.create({baseURL: baseUrl})
+const axiosInstance =  axios.create({baseURL: ""})
 
 
 axiosInstance.interceptors.request.use(function (config) {
