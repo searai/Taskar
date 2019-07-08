@@ -18,7 +18,6 @@ server.use(express.static(path.resolve(__dirname,"frontEnd", "dist")))
 server.use(express.json())
 server.use(express.urlencoded({extended:true}))
 server.use(cors())
-
 server.use(passport.initialize())
 
 
@@ -40,6 +39,6 @@ server.use("/comment", commentRoutes)
 
 if(process.env.NODE_ENV === "production"){
   server.get("*",(req, res)=>{
-    res.sendFile("index.html")
+    res.render("index.html")
   })
 }

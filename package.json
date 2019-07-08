@@ -9,7 +9,7 @@
     "server": "nodemon index.js",
     "client": "npm run serve --prefix frontEnd",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
-    "heroku": "npm install --prefix frontEnd && npm run build --prefix frontEnd"
+    "heroku-postbuild": "NPM_CONFIG_PRODUCTION = false   npm install --prefix frontEnd && npm run build --prefix frontEnd"
   },
   "author": "John O Connor",
   "license": "MIT",
