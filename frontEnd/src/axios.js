@@ -1,6 +1,6 @@
 import axios from "axios"
-const axiosInstance =  axios.create({baseURL: ""})
-
+const bUrl = (process.env.NODE_ENV === "development") ? "http://localhost:5000" : "/"
+const axiosInstance =  axios.create({baseURL: bUrl})
 
 axiosInstance.interceptors.request.use(function (config) {
     // Do something before request is sent
