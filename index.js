@@ -36,7 +36,7 @@ server.use("/user", userRoutes)
 server.use("/comment", commentRoutes)
 
 
-server.get("*",(req, res)=>{
+server.get(/.*/,(req, res)=>{
     server.use(express.static(path.join(__dirname, "frontEnd", "dist")))
     res.sendFile(path.join(__dirname,"frontEnd", "dist", "index.html"))
 })
