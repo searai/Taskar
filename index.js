@@ -18,7 +18,7 @@ server.use(express.json())
 server.use(express.urlencoded({extended:true}))
 server.use(cors())
 server.use(passport.initialize())
-server.use(express.static(path.join(__dirname, "frontEnd","dist")))
+
 
 if(process.env.NODE_ENV === "development"){
   server.use(function(req, res, next) {
@@ -36,6 +36,7 @@ server.use("/user", userRoutes)
 server.use("/comment", commentRoutes)
 
 if(process.env.NODE_ENV === "production"){
+  server.use(express.static(path.join(__dirname, "frontEnd","dist")))
   server.get(/.*/,(req, res)=>{
       res.sendFile(path.join(__dirname, "frontEnd", "dist", "index.html"))
   })
