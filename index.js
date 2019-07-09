@@ -34,6 +34,9 @@ server.listen(port, () => console.log(`Example app listening on port ${port}!`))
 server.use("/toDo",toDoRoutes)
 server.use("/user", userRoutes)
 server.use("/comment", commentRoutes)
+server.get("/hello", (req, res)=>{
+  res.send("hello")
+})
 
 if(process.env.NODE_ENV === "production"){
   server.use(express.static(path.join(__dirname, "frontEnd","dist")))
