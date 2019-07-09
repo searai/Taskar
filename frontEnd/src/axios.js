@@ -1,11 +1,11 @@
 import axios from "axios"
-const bUrl = (process.env.NODE_ENV === "development") ? "http://localhost:5000" : "/"
+const bUrl = (process.env.NODE_ENV === "production") ? "" : "http://localhost:5000"
 const axiosInstance =  axios.create({baseURL: bUrl})
 
 axiosInstance.interceptors.request.use(function (config) {
     // Do something before request is sent
     if(localStorage.getItem("token")){
-        config.headers = {authorization: `Bearer ${this.getToken}`}
+        config.headers = {authorization: `Bearer ${localStorage.getItem("token")}`}
     }
     return config;
   }, function (error) {
