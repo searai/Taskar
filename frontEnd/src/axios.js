@@ -1,5 +1,5 @@
 import axios from "axios"
-const bUrl = (process.env.NODE_ENV === "production") ? "" : "http://localhost:5000"
+const bUrl = (process.env.NODE_ENV === "production") ? "" : "http://localhost:5000gfg"
 const axiosInstance =  axios.create({baseURL: bUrl})
 
 axiosInstance.interceptors.request.use(function (config) {
