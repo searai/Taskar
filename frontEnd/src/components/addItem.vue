@@ -27,7 +27,7 @@ export default {
 
     methods:{
         addItem(){
-            axios.post("/toDo/add",{body:this.newItem,author:this.getUserName})
+            axios.post("/toDo/add",{body:this.newItem, author:this.getUserName})
             .then(doc=>{
                     console.log(doc)
                     eventBus.$emit("updateList")
