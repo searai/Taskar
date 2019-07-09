@@ -9,7 +9,7 @@
     "server": "nodemon index.js",
     "client": "npm run serve --prefix frontEnd",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
-    "build": "npm install --development --prefix frontEnd && npm install --prefix frontEnd && npm run build --prefix frontEnd"
+    "build": "npm install --only=dev --prefix frontEnd && npm install --prefix frontEnd && npm run build --prefix frontEnd"
   },
   "author": "John O Connor",
   "license": "MIT",
