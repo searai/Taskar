@@ -20,13 +20,13 @@ server.use(cors())
 server.use(passport.initialize())
 server.use(express.static(path.join(__dirname, "frontEnd","dist")))
 
-// if(process.env.NODE_ENV === "development"){
-//   server.use(function(req, res, next) {
-//       res.header("Access-Control-Allow-Origin", "*");
-//       res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-//       next();
-//     });
-// }
+if(process.env.NODE_ENV === "development"){
+  server.use(function(req, res, next) {
+      res.header("Access-Control-Allow-Origin", "*");
+      res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+      next();
+    });
+}
 
 server.listen(port, () => console.log(`Example app listening on port ${port}!`))
 
@@ -35,8 +35,8 @@ server.use("/toDo",toDoRoutes)
 server.use("/user", userRoutes)
 server.use("/comment", commentRoutes)
 
-
-server.get(/.*/,(req, res)=>{
-    res.sendFile(path.join(__dirname, "frontEnd", "dist", "index.html"))
-})
-
+if(process.env.NODE_ENV === "production"){
+  server.get(/.*/,(req, res)=>{
+      res.sendFile(path.join(__dirname, "frontEnd", "dist", "index.html"))
+  })
+}
