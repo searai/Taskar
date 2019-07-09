@@ -37,7 +37,7 @@ server.use("/comment", commentRoutes)
 
 if(process.env.NODE_ENV === "production"){
   server.get("*",(req, res)=>{
-    server.use(express.static(path.join(__dirname, "dist")))
+    server.use(express.static(path.join(__dirname, "frontEnd", "dist")))
     res.sendFile(path.join(__dirname,"frontEnd", "dist", "index.html"))
   })
 }
