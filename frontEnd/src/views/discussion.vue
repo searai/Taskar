@@ -1,19 +1,19 @@
 <template>
     <div>
-        <comment v-for="(comment, index) in mainComments" 
+        <comment v-for="(comment, index) in retrieveComments" 
         :key= "index" 
         :id= "comment._id"
         :commentBody = "comment.body"
         :author = "comment.author"
-        :level = 0
+        :propsLevel = 0
         >
         </comment>
         <div id ="showMore" v-if="showMore">
-            <button  @click="numberOfComments += 1 ">Show More</button>
+            <button  @click="numberOfComments += increment ">Show More</button>
         </div>
-        <form  @submit.prevent>
+        <form  v-else @submit.prevent>
             <textarea  v-model="newComment"  rows= "4"></textarea> <br>   
-            <input type="submit" id="submit" @click="postComment">
+            <input type="submit" id="submit" @click="postComment"> 
         </form> 
       
     </div>
@@ -31,9 +31,10 @@ export default {
     data(){
         return {
             newComment: "",
-            numberOfComments: 1,
+            increment: 10,
+            numberOfComments: 5,
             mainComments:[],
-            showMore:false
+            showMore:false,
         }
     },
     components:{
@@ -41,52 +42,65 @@ export default {
     },
 
     computed:{
-        ...mapGetters(["getToken"])
+        ...mapGetters(["getUserName"]),
+
+        retrieveComments(){
+                if(this.mainComments.length > this.numberOfComments){
+                    return this.mainComments.slice(0, this.numberOfComments)
+                }
+                return this.mainComments
+
+        },
       
     },
     methods:{
         postComment(){
             axios.post("/comment/add", {body:this.newComment, author:this.getUserName})
-            .then(reponse=>{
-                console.log(reponse.data)
-                this.fetchMainComments()
+            .then(()=>{
+                this.getMainComments()
             })
             .catch(e=>{
                 if(e.response.status == 401){
                     alert("you must login to post")
-                }else{
-                    console.error(e)
                 }
             })
+            this.newComment = ""
         },
-        fetchMainComments: async function(){
-            try{
-                const response = await axios.get("/comment/getAllMainComments")
-                if(response.data.length > this.numberOfComments){
+        showMoreButton(){
+            if(this.mainComments.length > this.numberOfComments){
                     this.showMore = true
-                    return this.mainComments = response.data.slice(0, this.numberOfComments)
-                }
+            }else{
                 this.showMore = false
-                this.mainComments = response.data
+            }
+        },
 
-        }catch(e){
-          console.error(e)
-         }
-        
+        getMainComments(){
+            axios.get("comment/getAllMainComments")
+            .then((response)=>{
+                    this.mainComments = response.data
+                    this.showMoreButton()
+
+            }).catch(e=>console.error(e))
         }
-        
+     
     },
     watch:{
-        numberOfComments: function(){
-            this.fetchMainComments()
-  
+        numberOfComments : function(){
+           this.showMoreButton()
         }
     },
+
     created(){
-        this.fetchMainComments()
-        eventBus.$on("getMainComments", ()=>{
-            this.fetchMainComments()
+        this.getMainComments()
+
+        setInterval(()=>{
+            this.getMainComments()
+        }, 5000)
+
+        eventBus.$on("getMainComments",(payload)=>{
+            this.getMainComments()
         })
+
     }
 
 }
@@ -106,14 +120,21 @@ textarea{
 }
 #submit{
     width:60%;
+    color:black;
+    background-color: rgb(73, 180, 216);
     padding:5px;
-    font-size:1.2em;
-    border:none;
+    border-style:none;
     border-radius:2px;
-    background-color:blue;
 
 }
 #showMore{
     text-align: center;
+}
+#showMore button{
+    color:black;
+    background-color: rgb(73, 180, 216);
+    padding:5px;
+    border-style:none;
+    border-radius:2px;
 }
 </style>

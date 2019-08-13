@@ -63,6 +63,12 @@ methods:{
 
 #logout{
     float:right;
+    background-color:blue;
+    color:white;
+    padding:10px;
+    border-radius: 4px;
+    width:60px;
+    border-style:none;
 }
 
 #username{
@@ -78,15 +84,8 @@ methods:{
 
 h1{
     clear:right;
+}
 
-}
-button{ 
-    background-color:blue;
-    color:white;
-    padding:10px;
-    border-radius: 2px;
-    width:60px;
-}
 a{
     display:inline-block;
     background-color:blue;

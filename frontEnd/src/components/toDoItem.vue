@@ -1,23 +1,28 @@
 <template>
   <div>
-    <div class = "toDoItem" :style ="{display:currentDisplay}">
-      <div id="inner-div">
-        {{data}}
-        <div id="buttons">
-          <button id ="edit" @click = "displayEdit()">Edit</button>
-          <button id ="remove" @click = "removeItem()">Remove</button>
-        </div> 
+    <div v-if="!loading">
+      <div class = "toDoItem" v-if="!editDisplay">
+        <div id="data">
+          {{data}}
+          <div id="icons">
+            <font-awesome-icon @click = "displayEdit()" icon="edit" />
+            <font-awesome-icon style="margin-left:4px" @click = "removeItem()" icon="trash" />
+          </div> 
+        </div>
       </div>
+      <save-changes v-else
+        :id = "id"
+      >
+      </save-changes>
     </div>
-    <save-changes :id = "id" :display="editDisplay"></save-changes>
-    
-      
+    <div v-else id = "loading">
+    </div>   
   </div>
 </template>
 
 <script>
-import saveChanges from "@/components/saveChanges.vue"
-import {eventBus} from "@/main.js"
+import saveChanges from "./saveChanges.vue"
+import {eventBus} from "../main.js"
 import axios from "../axios.js"
 
 
@@ -25,24 +30,23 @@ export default {
   props: ["data", "id"],
   data(){
     return {
-      currentDisplay: "block",
-      editDisplay : "none"
+      editDisplay : false,
+      loading: false
 
     }
   },
   methods:{
     displayEdit(){
-      this.currentDisplay ="none"
-      this.editDisplay ="block"
+      this.editDisplay = true
     },
 
     removeItem(){
+      this.loading = true
       axios.delete(`/toDo/remove/${this.id}`)
       .then(()=>{
         eventBus.$emit("updateList")
       }).catch(e=>console.error(e))
 
-      
     },
    
   },
@@ -50,54 +54,57 @@ export default {
       saveChanges
   },
   created(){
-    eventBus.$on("change",()=>{
-      this.currentDisplay = "block"
-      this.editDisplay ="none"
+    eventBus.$on("save",(payload)=>{
+      this.editDisplay = false
+      if(payload == this.id){
+        this.loading = true
+      }
+     
     })
-  }
 
-  
+    eventBus.$on("cancelLoading",()=>{
+      this.loading = false
+    })
+
+    eventBus.$on("cancelEdit",()=>{
+      this.editDisplay = false
+    })
+
+  }
 }
 </script>
 
-
 <style scoped>
+
 .toDoItem{
   width:60%;
   border-bottom:solid black 1px;
   margin: 10px auto;
-
-
+  padding:2px;
 }
-#inner-div{
+
+#data{
   padding: 2px 0;
 }
-#buttons{
+#icons{
   float:right;
+  color:blue;
+  font-size: 16px;
 }
 
-#remove{
-  background-color:lightgreen;
-  color:black;
-  border: solid grey 1px;
-  border-radius: 2px;
-  padding:2px;
-  position:relative;
-  bottom:2px;
-  margin-left:3px;
-  
+#loading{
+  border: 16px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 16px solid #3498db;
+  width: 20px;
+  height: 20px;
+  animation: spin 2s linear infinite;
+  margin: 10px auto;
 }
 
-#edit{
-  background-color:lightgreen;
-  color:black;
-  border: solid grey 1px;
-  border-radius: 2px;
-  padding:2px;
-  position:relative;
-  bottom:2px;
-  
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
-
 
 </style>

@@ -1,8 +1,8 @@
 <template>
     <div>
         <div id="addItem">
-            <input type="text" @keyup.enter ="addItem"  placeholder="Enter the new item" v-model="newItem" >
-            <button @click="addItem">Submit</button>
+            <input type="text" @keyup.enter ="addItem"  placeholder="Enter new item " v-model="newItem" >
+            <button @click="addItem"><font-awesome-icon icon="plus"/></button>
         </div>
     </div>
 </template>
@@ -29,14 +29,11 @@ export default {
         addItem(){
             axios.post("/toDo/add",{body:this.newItem, author:this.getUserName})
             .then(doc=>{
-                    console.log(doc)
-                    eventBus.$emit("updateList")
+                    eventBus.$emit("updateList", "addItem")
                 })
             .catch(e=>console.error(e))
 
-
         }
-
     }
  
 }
@@ -44,23 +41,16 @@ export default {
 
 <style scoped>
 #addItem{
-    width:60%;
-    text-align: center;
-    margin: 0 auto;
+  margin:10px 0px;
+  text-align:center;
     
 }
-
-button{
-    border:none;
-    background-color: rgba(220, 20, 60, 0.836);
-    margin-left: .2em;
-    height:2em;
-    border-radius: 2px;
+#addItem input, button{
+    font-size:18px
 }
-input{
-    height:1.7em;
-    border-radius: 2px;
-    border: solid grey 1px;;
+
+#addItem button{
+    color:blue;
 }
 
 </style>

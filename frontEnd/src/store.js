@@ -6,9 +6,8 @@ vue.use(vuex)
 
 const store = new vuex.Store({
     state: {
-      userName: undefined,
-      token: undefined,
-      levelRange: 1
+      userName: null,
+      token: null
 
     },
     getters:{
@@ -17,16 +16,14 @@ const store = new vuex.Store({
         },
         getToken(state){
           return state.token
-        },
-        getLevelRange(state){
-          return state.levelRange
         }
     },
     mutations: {
       logout (state) {
-        state.userName = undefined
-        state.token = undefined
-        localStorage.clear()
+        state.userName = null
+        state.token = null
+        localStorage.removeItem("userName")
+        localStorage.removeItem("token")
         router.replace({path:"/"})
       },
       storeUser(state, payload){
@@ -38,7 +35,7 @@ const store = new vuex.Store({
       setLogOutTimer({commit}){
         setTimeout(()=>{
           commit("logout")
-        },10000)    
+        },60*60*1000)    
     }
   
   }

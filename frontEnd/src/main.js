@@ -5,10 +5,10 @@ import {routes} from "./routes/routes.js"
 import vuex from "vuex"
 import store from "./store.js"
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faUserSecret } from '@fortawesome/free-solid-svg-icons'
+import { faEdit, faTrash, faSave, faEye, faEyeSlash, faReply, faWindowClose, faSearch, faPlus } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
-library.add(faUserSecret)
+library.add(faEdit, faTrash, faSave, faEye, faEyeSlash, faReply, faWindowClose, faSearch, faPlus )
 vue.component('font-awesome-icon', FontAwesomeIcon)
 
 vue.use(vueRouter)

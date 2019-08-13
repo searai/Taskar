@@ -1,8 +1,11 @@
 <template>
 
-    <div id="changeStatus" :style="{display:display}">
-        <input type="text" v-model = "editedData">
-        <button id ="edit" @click = "editItem()">Edit</button>
+    <div id="saveChanges" >
+        <div id="icons">
+            <font-awesome-icon @click = "editItem()" icon="save" />
+            <font-awesome-icon style="margin-left:6px" @click = "cancel()" icon="window-close" />
+        </div>
+        <input id= "edit" type="text" v-model = "editedData">
     </div>
 
 </template>
@@ -15,7 +18,7 @@ import {eventBus} from "../main.js"
 import axios from "../axios.js"
 
 export default {
-    props:["id","display"],
+    props:["id"],
 
     data(){
         return {
@@ -28,30 +31,34 @@ export default {
             axios.put(`/toDo/update/${this.id}`,{body:this.editedData})
             .then(response=>{
                 eventBus.$emit("updateList")
-                console.log(response)
             }).catch(e=>console.log(e))
 
-            eventBus.$emit("change")
+            eventBus.$emit("save", this.id)
 
+        },
+        cancel(){
+            eventBus.$emit("cancelEdit")
         }
     }
 
 }
 </script>
 
-<style>
-#changeStatus{
+<style scoped>
+
+#saveChanges{
     width:60%;
     margin:10px auto;
-    text-align: center;
+    border-bottom:solid black 1px;
+    padding:2px;
 }
 #edit{
-  padding:2px;
-  background-color:lightgreen;
-  color:black;
-  width:80px;
-  border: solid grey 1px;
-  border-radius: 2px;
+    
+}
+#icons{
+    float:right;
+    color:blue;
+    font-size: 16px;
 }
 
 </style>

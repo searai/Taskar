@@ -1,47 +1,47 @@
 <template>
-    <div>
-        <div v-if = "getLevel < getLevelRange"  id= "comment">
+    <div id = "comment">
             <div id = "comment-body">
                 <strong>{{author}}</strong>
                 <p>{{commentBody}}</p>
             </div>
             <div v-if = "editOrReply == 'edit'" class = "edit-pane">
                 <textarea v-model= "updatedComment"></textarea> <br>
-                <button  class="buttons" @click = "editComment">Save changes</button>
-                <button  class="buttons" @click = "editOrReply = 'none'">Cancel</button>
+                <font-awesome-icon class = "icons" @click = "editComment" icon="save"/>
+                <font-awesome-icon class = "icons" @click = "editOrReply = 'none'" icon="window-close" />
             </div>
             <div v-else-if = "editOrReply == 'reply'" class = "edit-pane">
                 <textarea v-model= "reply"></textarea> <br>
-                <button  class="buttons" @click = "postReply">Post</button>
-                <button  class="buttons" @click = "editOrReply = 'none'">Cancel</button>
+                <font-awesome-icon class = "icons" @click = "postReply" icon="save" />
+                <font-awesome-icon class = "icons" @click = "editOrReply = 'none'" icon="window-close" />
             </div>
             <div v-else id="nav-pane">
                 <span v-if="author == getUserName">
-                    <button class="buttons" @click = "editOrReply = 'edit'">Edit</button>
-                    <button class="buttons" @click = "removeComment" >Remove</button>
+                    <font-awesome-icon class = "icons" @click = "editOrReply = 'edit'" icon="edit" />
+                    <font-awesome-icon class = "icons"  @click = "removeComment()"  icon="trash" />
                 </span>
                 <span v-if="this.getToken">
-                    <button class="buttons" @click = "editOrReply = 'reply'">Reply</button>
+                    <font-awesome-icon class = "icons" @click = "editOrReply = 'reply'"  icon="reply" />
                 </span>
             </div>
-
-            <comment class = "replies" v-for="(reply, index) in replies" 
-            :key= "index" 
-            :id= "reply._id"
-            :commentBody = "reply.body"
-            :author = "reply.author"
-            :linkedTo = "reply.linkedTo"
-            :level = "level + 1"
-            >
-            </comment>
-            <div id ="showMore" v-if = "showMore">
-                <button  @click="numberOfComments += 1">Show More</button>
+            <div v-if = "(level + 1)< levelRange">
+                <comment  class = "replies" v-for="(reply, index) in retrieveComments" 
+                :index = "index"
+                :key= "index" 
+                :id= "reply._id"
+                :commentBody = "reply.body"
+                :author = "reply.author"
+                :linkedTo = "reply.linkedTo"
+                :propsLevel = "level + 1"
+                >
+                </comment>
+                <div id ="showMoreComments" v-if = "showMore">
+                    <button  @click="numberOfComments += increment">Show More Comments</button>
+                </div>
             </div>
-        </div>
-        <div v-else-if = "getLevel == getLevelRange">
-            <button @click = "decreaseLevel()">Show more</button>
-        </div>
-
+             <div v-if = "(level+1) == levelRange && replies.length >0">
+                <button id= "showMoreReplies" @click = "level -= 2">Show More Replies</button>
+            </div> 
+    
 
     </div>
 </template>
@@ -55,7 +55,7 @@ export default {
 
     name : "comment",
 
-    props: ["commentBody", "author" ,"id", "linkedTo", "level"],
+    props: ["commentBody", "author" ,"id", "linkedTo", "propsLevel", "index"],
 
     data(){
         return {
@@ -64,30 +64,46 @@ export default {
             replies:[],
             editOrReply : "none",
             showMore: false,
-            numberOfComments: 1,
-            levelStep: 0,
-
+            numberOfComments: 2,
+            increment: 5,
+            levelRange: 1,
+            level : this.propsLevel
+            
         }
     },
     computed:{
-        ...mapGetters(["getUserName","getToken", "getLevelRange"]),
+        ...mapGetters(["getUserName","getToken"]),
 
-        getLevel(){
-            return this.level - this.levelStep
-        }
-        
+        retrieveComments(){
+                if(this.replies.length > this.numberOfComments){
+                    return this.replies.slice(0, this.numberOfComments)
+                }
+                return this.replies
+
+        },  
     },
 
     methods:{
         removeComment(){
-             axios.delete(`/comment/remove/${this.id}`)
-            .then(()=>{
-                        if(!this.linkedTo){
-                            return eventBus.$emit("getMainComments")
-                        }
-                        return eventBus.$emit("generateReplies",this.linkedTo)
-            })
-            .catch(e=>console.error(e))
+            function remove(id, linkedTo){
+                axios.delete(`/comment/remove/${id}`)
+                .then(()=>{
+                            if(!linkedTo){
+                                return eventBus.$emit("getMainComments")
+                            }
+                            return eventBus.$emit("generateReplies", linkedTo)
+                })
+                .catch(e=>console.error(e))
+            }
+
+            if(this.replies.length > 0){
+                if(confirm("All associated comments will also be deleted")){
+                    remove(this.id, this.linkedTo)
+                }
+            }else{
+                remove(this.id, this.linkedTo)
+            }            
+           
         },
         editComment(){
             this.editOrReply = "none"
@@ -100,53 +116,54 @@ export default {
             })
             .catch(e=>console.error(e))
         },
+        showMoreButton(){
+            if(this.replies.length > this.numberOfComments){
+                    this.showMore = true
+            }else{
+                this.showMore = false
+            }
+        },
         
         getReplies(){
             axios.get(`comment/getAllReplies/${this.id}`)
             .then(response => {
-                if(response.data.length > this.numberOfComments){
-                    this.showMore = true
-                    return this.replies = response.data.slice(0, this.numberOfComments)
-                }
-                this.showMore = false
-                this.replies = response.data
-                })
-            .catch(e=>console.error(e))
+                    this.replies = response.data
+                    this.showMoreButton()
+            })
 
         },
         postReply(){
             this.editOrReply = "none"
-            axios.post("/comment/add", {body:this.reply, author:this.getUserName, linkedTo: this.id}, {headers:{"authorization": `Bearer ${this.getToken}`}})
+            axios.post("/comment/add", {body:this.reply, author:this.getUserName, linkedTo: this.id})
             .then(()=>{
+                if((this.level+1) == this.levelRange){
+                    this.level -= 2 
+                }
                 this.getReplies()
             })
             .catch(e=>{
                 if(e.response.status == 401){
-                    alert("you must login to post")
-                }else{
-                    console.error(e)
+                    alert("You must login to post")
                 }
             })
-        },
-        decreaseLevel(){
-            this.levelStep += 1
         }
 
     },
     watch:{
         numberOfComments: function(){
-            this.getReplies()
-  
+            this.showMoreButton()
         }
     },
     created(){
         this.getReplies()
+        setInterval(()=>this.getReplies()
+        ,5000)
+
         eventBus.$on("generateReplies",(payload)=>{
             if(this.id ==payload){
                 this.getReplies()
             }
-        })
-        
+        })    
 
     }
 }
@@ -155,7 +172,7 @@ export default {
 <style scoped>
 
 #comment{
-    width: 250px;
+    width: 200px;
     margin: 10px auto;
 }
 
@@ -173,6 +190,8 @@ export default {
     width:200px;
     text-align:right;
     margin: 0 auto;
+    position: relative;
+    bottom:15px;
 }
 
 .edit-pane textarea{
@@ -184,16 +203,9 @@ export default {
 #nav-pane{
     width:200px;
     text-align:right;
-    margin: 2px auto;
-
-}
-.buttons{
-    padding:2px;
-    width:60px;
-    background-color:rgb(39, 133, 165);
-    border:none;
-    border-radius:2px;
-    margin-left:5px;
+    margin: 0 auto;
+    position: relative;
+    bottom:15px;
 
 }
 
@@ -202,9 +214,31 @@ export default {
     left:30px;
     
 }
-#showMore{
+#showMoreComments{
     text-align: center;
     position:relative;
     left:30px;
+    background-color: rgb(73, 180, 216);
+    padding:5px;
+    border-style:none;
+    border-radius:2px;
 }
+
+#showMoreReplies{
+    position:relative;
+    left:150px;
+    color:black;
+    background-color: rgb(73, 180, 216);
+    padding:5px;
+    border-style:none;
+    border-radius:2px;
+}
+
+
+.icons{
+    font-size: 17px;
+    color: rgb(12, 86, 110);
+    margin-left:4px;
+}
+
 </style>
