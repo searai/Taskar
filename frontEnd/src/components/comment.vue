@@ -1,5 +1,6 @@
 <template>
     <div id = "comment">
+        <div v-if= "!loading">
             <div id = "comment-body">
                 <strong>{{author}}</strong>
                 <p>{{commentBody}}</p>
@@ -23,6 +24,9 @@
                     <font-awesome-icon class = "icons" @click = "editOrReply = 'reply'"  icon="reply" />
                 </span>
             </div>
+        </div>
+        <div v-else id = "loading">
+        </div> 
             <div v-if = "(level + 1)< levelRange">
                 <comment  class = "replies" v-for="(reply, index) in retrieveComments" 
                 :index = "index"
@@ -65,9 +69,10 @@ export default {
             editOrReply : "none",
             showMore: false,
             numberOfComments: 2,
-            increment: 5,
+            increment: 2,
             levelRange: 1,
-            level : this.propsLevel
+            level : this.propsLevel,
+            loading: false
             
         }
     },
@@ -85,34 +90,40 @@ export default {
 
     methods:{
         removeComment(){
-            function remove(id, linkedTo){
-                axios.delete(`/comment/remove/${id}`)
-                .then(()=>{
-                            if(!linkedTo){
-                                return eventBus.$emit("getMainComments")
-                            }
-                            return eventBus.$emit("generateReplies", linkedTo)
-                })
-                .catch(e=>console.error(e))
-            }
-
+            this.loading = true
+            this.level += 5
             if(this.replies.length > 0){
                 if(confirm("All associated comments will also be deleted")){
-                    remove(this.id, this.linkedTo)
+                 axios.delete(`/comment/removeMany/${id}`)
+                .then(()=>{ 
+                            if(!this.linkedTo){
+                                return eventBus.$emit("getMainComments")
+                            }
+                            return eventBus.$emit("generateReplies", this.linkedTo)
+                })
+                .catch(e=>console.error(e))
                 }
             }else{
-                remove(this.id, this.linkedTo)
+                axios.delete(`/comment/removeOne/${id}`)
+                .then(()=>{ 
+                            if(!this.linkedTo){
+                                return eventBus.$emit("getMainComments")
+                            }
+                            return eventBus.$emit("generateReplies", this.linkedTo)
+                })
+                .catch(e=>console.error(e))
             }            
            
         },
         editComment(){
+            this.loading = true
             this.editOrReply = "none"
              axios.put(`/comment/update/${this.id}`, {body:this.updatedComment})
             .then(()=>{
                         if(!this.linkedTo){
                             return eventBus.$emit("getMainComments")
                         }
-                        return eventBus.$emit("generateReplies",this.linkedTo)
+                        return eventBus.$emit("generateReplies", this.linkedTo)
             })
             .catch(e=>console.error(e))
         },
@@ -127,6 +138,7 @@ export default {
         getReplies(){
             axios.get(`comment/getAllReplies/${this.id}`)
             .then(response => {
+                    eventBus.$emit("cancelLoading")
                     this.replies = response.data
                     this.showMoreButton()
             })
@@ -139,6 +151,11 @@ export default {
                 if((this.level+1) == this.levelRange){
                     this.level -= 2 
                 }
+
+                if((this.replies.length + 1) > this.numberOfComments){
+                    this.numberOfComments = this.replies.length + this.increment
+                }
+
                 this.getReplies()
             })
             .catch(e=>{
@@ -159,11 +176,15 @@ export default {
         setInterval(()=>this.getReplies()
         ,5000)
 
-        eventBus.$on("generateReplies",(payload)=>{
-            if(this.id ==payload){
+        eventBus.$on("generateReplies",(id)=>{
+            if(this.id == id){
                 this.getReplies()
             }
-        })    
+        })
+
+        eventBus.$on("cancelLoading", ()=>{
+            this.loading = false
+        })
 
     }
 }
@@ -218,6 +239,10 @@ export default {
     text-align: center;
     position:relative;
     left:30px;
+   
+}
+
+#showMoreComments button{
     background-color: rgb(73, 180, 216);
     padding:5px;
     border-style:none;

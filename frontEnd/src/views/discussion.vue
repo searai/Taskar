@@ -11,6 +11,9 @@
         <div id ="showMore" v-if="showMore">
             <button  @click="numberOfComments += increment ">Show More</button>
         </div>
+        <div v-if = "loading" id = "loading">
+        </div>
+
         <form  v-else @submit.prevent>
             <textarea  v-model="newComment"  rows= "4"></textarea> <br>   
             <input type="submit" id="submit" @click="postComment"> 
@@ -35,6 +38,7 @@ export default {
             numberOfComments: 5,
             mainComments:[],
             showMore:false,
+            loading: true
         }
     },
     components:{
@@ -55,6 +59,7 @@ export default {
     },
     methods:{
         postComment(){
+            this.loading = true
             axios.post("/comment/add", {body:this.newComment, author:this.getUserName})
             .then(()=>{
                 this.getMainComments()
@@ -77,6 +82,8 @@ export default {
         getMainComments(){
             axios.get("comment/getAllMainComments")
             .then((response)=>{
+                    eventBus.$emit("cancelLoading")
+                    this.loading = false
                     this.mainComments = response.data
                     this.showMoreButton()
 
@@ -97,7 +104,7 @@ export default {
             this.getMainComments()
         }, 5000)
 
-        eventBus.$on("getMainComments",(payload)=>{
+        eventBus.$on("getMainComments",()=>{
             this.getMainComments()
         })
 
@@ -137,4 +144,5 @@ textarea{
     border-style:none;
     border-radius:2px;
 }
+
 </style>

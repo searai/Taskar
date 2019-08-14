@@ -28,12 +28,11 @@ export default {
 
     methods:{
         editItem(){
+            eventBus.$emit("save", this.id)
             axios.put(`/toDo/update/${this.id}`,{body:this.editedData})
             .then(response=>{
                 eventBus.$emit("updateList")
             }).catch(e=>console.log(e))
-
-            eventBus.$emit("save", this.id)
 
         },
         cancel(){

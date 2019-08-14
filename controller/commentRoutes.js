@@ -38,7 +38,7 @@ router.put("/update/:id", (req, res)=>{
 })
 
 
-router.delete("/remove/:id",(req, res)=>{
+router.delete("/removeMany/:id",(req, res)=>{
     function remove(id){
         Comment.findOneAndDelete({_id:id})
         .then((doc)=>{
@@ -57,17 +57,18 @@ router.delete("/remove/:id",(req, res)=>{
   })
 
 
+ 
 
-// router.delete("/remove/:id",(req, res)=>{
-//     Comment.findOneAndDelete({_id: req.params.id})
-//     .then((doc)=>{
-//         if(doc){
-//             res.send(`${doc} was deleted`)
-//         }else{
-//             res.send("That document was not found")
-//         }
-//     })
-//     .catch(e => res.status(500).send(e))
-//   })
+router.delete("/removeOne/:id",(req, res)=>{
+    Comment.findOneAndDelete({_id: req.params.id})
+    .then((doc)=>{
+        if(doc){
+            res.send(`${doc} was deleted`)
+        }else{
+            res.send("That document was not found")
+        }
+    })
+    .catch(e => res.status(500).send(e))
+  })
 
 module.exports = router
