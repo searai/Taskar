@@ -9,7 +9,7 @@
         <add-item v-if="addItem"></add-item>
         <div v-else id= "search">
           <input v-model="searchData" type="text" placeholder= "enter item details">
-          <button  @click="search()"> <font-awesome-icon icon="search" /></button>
+          <button  @click = "search()"> <font-awesome-icon icon="search" /></button>
         </div>
         
         <toDoItem v-for="(item) in listOfItems" 
@@ -70,7 +70,9 @@ export default {
           this.loading = false
       
         }catch(e){
-          console.error(e)
+           if(e.response.status == 500){
+            this.$router.replace("/serverError")
+          }
         }
     },
     search: async function(){
@@ -79,7 +81,9 @@ export default {
           const response = await axios.get(`/toDo/search/${this.$store.getters.getUserName}?search=${this.searchData}`)
           this.listOfItems = response.data
         }catch(e){
-          console.error(e)
+           if(e.response.status == 500){
+            this.$router.replace("/serverError")
+          }
         }    
 
     },
@@ -103,7 +107,11 @@ export default {
             this.listOfItems = response.data
             this.loading = false
           })
-          .catch((e)=>console.log(e))
+          .catch((e)=>{
+             if(e.response.status == 500){
+              this.$router.replace("/serverError")
+            }
+          })
 
     }else{
       this.getAll()
@@ -119,9 +127,10 @@ export default {
         eventBus.$emit("cancelLoading")
         this.loading = false
       })
-      .catch(()=>{
-        this.loading = false
-        alert("An error occured on the server")
+      .catch((e)=>{
+        if(e.response.status == 500){
+          this.$route.replace("/serverError")
+        }
       })
     })
     

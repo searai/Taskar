@@ -102,9 +102,10 @@ export default {
                             }
                             return eventBus.$emit("generateReplies", this.linkedTo)
                 })
-                .catch(()=>{
-                    this.loading = false
-                    alert("An error occured on the server")
+                .catch((e)=>{
+                     if(e.response.status == 500){
+                        this.$router.replace("/serverError")
+                    }
                 })
                 }
             }else{
@@ -116,8 +117,9 @@ export default {
                             return eventBus.$emit("generateReplies", this.linkedTo)
                 })
                 .catch(e=>{
-                    this.loading = false
-                    alert("An error occured on the server")
+                     if(e.response.status == 500){
+                        this.$router.replace("/serverError")
+                    }
                 })
             }            
            
@@ -133,8 +135,9 @@ export default {
                         return eventBus.$emit("generateReplies", this.linkedTo)
             })
             .catch(e=>{
-                this.loading = false
-                alert("An error occured on the server")
+                 if(e.response.status == 500){
+                    this.$router.replace("/serverError")
+                }
             })
         },
         showMoreButton(){
@@ -151,9 +154,10 @@ export default {
                 eventBus.$emit("cancelLoading")
                 this.replies = response.data
                 this.showMoreButton()
-            }).catch(()=>{
-                eventBus.$emit("cancelLoading")
-                alert("An error occured on the server")
+            }).catch((e)=>{
+                 if(e.response.status == 500){
+                    this.$router.replace("/serverError")
+                }
             })
 
         },

@@ -27,6 +27,7 @@ router.delete("/remove/:id", (req, res)=>{
     ToDo.findOneAndDelete({_id: req.params.id})
     .then((doc)=>res.send(`${doc} was deleted`))
     .catch(e => res.status(500).send(e))
+
 })
 
 

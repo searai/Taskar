@@ -46,8 +46,9 @@ export default {
       .then(()=>{
         eventBus.$emit("updateList")
       }).catch(e=>{
-        this.loading = false
-        alert("An error occured on the server")
+        if(e.response.status == 500){
+          this.$router.replace("/serverError")
+        }
       })
 
     },

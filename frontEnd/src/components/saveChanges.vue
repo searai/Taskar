@@ -12,8 +12,6 @@
 
 
 <script>
-
-import Vue from "vue"
 import {eventBus} from "../main.js"
 import axios from "../axios.js"
 
@@ -30,10 +28,12 @@ export default {
         editItem(){
             eventBus.$emit("save", this.id)
             axios.put(`/toDo/update/${this.id}`,{body:this.editedData})
-            .then(response=>{
+            .then(()=>{
                 eventBus.$emit("updateList")
             }).catch(e=>{
-                alert("An error occured on the server")
+                 if(e.response.status == 500){
+                    this.$router.replace("/serverError")
+                }
             })
 
         },

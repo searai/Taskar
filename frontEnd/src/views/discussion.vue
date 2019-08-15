@@ -68,7 +68,9 @@ export default {
                 if(e.response.status == 401){
                     alert("you must login to post")
                 }
-                this.loading = false
+                else if(e.response.status == 500){
+                    this.$router.replace("/serverError")
+                }
             })
             this.newComment = ""
         },
@@ -89,8 +91,9 @@ export default {
                     this.showMoreButton()
 
             }).catch(e=>{
-                this.loading = false
-                alert("An error occured on the server")
+                 if(e.response.status == 500){
+                    this.$router.replace("/serverError")
+                }
             })
         }
      
