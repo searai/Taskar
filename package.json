@@ -10,7 +10,6 @@
     "client": "npm run serve --prefix frontEnd",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "build": "npm install --only=dev --prefix frontEnd && npm install --prefix frontEnd && npm run build --prefix frontEnd"
-    
   },
   "author": "John O Connor",
   "license": "MIT",
@@ -18,7 +17,7 @@
     "@fortawesome/fontawesome-svg-core": "^1.2.19",
     "bcrypt": "^3.0.6",
     "cors": "^2.8.5",
-    "dotenv": "^8.0.0",
+    "dotenv-flow": "^3.0.0",
     "express": "^4.16.4",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.5.0",

@@ -119,7 +119,10 @@ export default {
         eventBus.$emit("cancelLoading")
         this.loading = false
       })
-      .catch(e=>console.log(e))
+      .catch(()=>{
+        this.loading = false
+        alert("An error occured on the server")
+      })
     })
     
 

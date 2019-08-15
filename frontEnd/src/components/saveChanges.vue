@@ -32,7 +32,9 @@ export default {
             axios.put(`/toDo/update/${this.id}`,{body:this.editedData})
             .then(response=>{
                 eventBus.$emit("updateList")
-            }).catch(e=>console.log(e))
+            }).catch(e=>{
+                alert("An error occured on the server")
+            })
 
         },
         cancel(){

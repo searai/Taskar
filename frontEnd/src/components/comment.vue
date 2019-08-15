@@ -93,25 +93,32 @@ export default {
             this.loading = true
             this.level += 5
             if(this.replies.length > 0){
+                this.level += 5
                 if(confirm("All associated comments will also be deleted")){
-                 axios.delete(`/comment/removeMany/${id}`)
+                 axios.delete(`/comment/removeMany/${this.id}`)
                 .then(()=>{ 
                             if(!this.linkedTo){
                                 return eventBus.$emit("getMainComments")
                             }
                             return eventBus.$emit("generateReplies", this.linkedTo)
                 })
-                .catch(e=>console.error(e))
+                .catch(()=>{
+                    this.loading = false
+                    alert("An error occured on the server")
+                })
                 }
             }else{
-                axios.delete(`/comment/removeOne/${id}`)
+                axios.delete(`/comment/removeOne/${this.id}`)
                 .then(()=>{ 
                             if(!this.linkedTo){
                                 return eventBus.$emit("getMainComments")
                             }
                             return eventBus.$emit("generateReplies", this.linkedTo)
                 })
-                .catch(e=>console.error(e))
+                .catch(e=>{
+                    this.loading = false
+                    alert("An error occured on the server")
+                })
             }            
            
         },
@@ -125,11 +132,14 @@ export default {
                         }
                         return eventBus.$emit("generateReplies", this.linkedTo)
             })
-            .catch(e=>console.error(e))
+            .catch(e=>{
+                this.loading = false
+                alert("An error occured on the server")
+            })
         },
         showMoreButton(){
             if(this.replies.length > this.numberOfComments){
-                    this.showMore = true
+                this.showMore = true
             }else{
                 this.showMore = false
             }
@@ -138,9 +148,12 @@ export default {
         getReplies(){
             axios.get(`comment/getAllReplies/${this.id}`)
             .then(response => {
-                    eventBus.$emit("cancelLoading")
-                    this.replies = response.data
-                    this.showMoreButton()
+                eventBus.$emit("cancelLoading")
+                this.replies = response.data
+                this.showMoreButton()
+            }).catch(()=>{
+                eventBus.$emit("cancelLoading")
+                alert("An error occured on the server")
             })
 
         },
@@ -151,9 +164,8 @@ export default {
                 if((this.level+1) == this.levelRange){
                     this.level -= 2 
                 }
-
                 if((this.replies.length + 1) > this.numberOfComments){
-                    this.numberOfComments = this.replies.length + this.increment
+                    this.numberOfComments = (this.replies.length + 1) + this.increment
                 }
 
                 this.getReplies()
@@ -161,6 +173,8 @@ export default {
             .catch(e=>{
                 if(e.response.status == 401){
                     alert("You must login to post")
+                }else if(e.response.status == 500){
+                    alert("An error occured on the server")
                 }
             })
         }

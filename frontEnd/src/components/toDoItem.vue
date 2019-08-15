@@ -45,7 +45,10 @@ export default {
       axios.delete(`/toDo/remove/${this.id}`)
       .then(()=>{
         eventBus.$emit("updateList")
-      }).catch(e=>console.error(e))
+      }).catch(e=>{
+        this.loading = false
+        alert("An error occured on the server")
+      })
 
     },
    

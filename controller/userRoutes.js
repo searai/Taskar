@@ -3,7 +3,10 @@ const router = express.Router()
 const User = require("../models/user.js")
 const bcrypt = require("bcrypt")
 const jwt = require("jsonwebtoken")
-require('dotenv').config()
+require('dotenv-flow').config({
+    node_env: process.env.NODE_ENV || 'development'
+}   
+);
 
 router.post("/signUp", (req, res)=>{
 

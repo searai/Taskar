@@ -68,6 +68,7 @@ export default {
                 if(e.response.status == 401){
                     alert("you must login to post")
                 }
+                this.loading = false
             })
             this.newComment = ""
         },
@@ -87,7 +88,10 @@ export default {
                     this.mainComments = response.data
                     this.showMoreButton()
 
-            }).catch(e=>console.error(e))
+            }).catch(e=>{
+                this.loading = false
+                alert("An error occured on the server")
+            })
         }
      
     },
