@@ -2,8 +2,9 @@
 
 <div>
     <headmast></headmast>
-    <nav-bar></nav-bar>
-    <router-view></router-view>
+    <!-- <nav-bar></nav-bar>
+    <router-view></router-view> -->
+    <test></test>
 
 </div>
 
@@ -12,11 +13,13 @@
 <script>
 import header from "./components/header.vue"
 import nav from "./components/nav.vue"
+import test from "./components/test.vue"
 
 export default {
     components:{
         navBar:nav,
-        headmast:header
+        headmast:header,
+        test
     },
     created(){
         if(localStorage.getItem("userName")){
